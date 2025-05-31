@@ -20,7 +20,7 @@ input[type="number"] {
 .table-container {
   overflow-x: auto;
   overflow-y: auto;
-  max-height: 400px; /* Vertical scrolling */
+  max-height: 800px; /* Vertical scrolling */
   min-width: 0; /* Prevent container stretching */
   width: 100%; /* Container fits parent */
 }
