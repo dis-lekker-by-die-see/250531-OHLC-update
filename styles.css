@@ -1,6 +1,7 @@
 body {
   font-family: Arial, sans-serif;
   margin: 20px;
+  background-color: #f5f5f5; /* Light grey background */
 }
 #output {
   white-space: pre-wrap;
@@ -11,7 +12,19 @@ body {
 }
 button {
   margin: 5px;
-  padding: 10px;
+  padding: 10px 15px;
+  background-color: #007bff; /* Blue background */
+  color: white; /* White text */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+button:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+button:disabled {
+  background-color: #6c757d; /* Grey for disabled */
+  cursor: not-allowed;
 }
 input[type="file"],
 input[type="number"] {
