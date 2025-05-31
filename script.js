@@ -92,6 +92,35 @@ function calculateSMA(data, periods) {
   return sma;
 }
 
+// function updateTable(data) {
+//   if (!data) return;
+//   const tbody = document.querySelector("#jsonTable tbody");
+//   tbody.innerHTML = "";
+//   const periods = parseFloat(document.getElementById("smaPeriods").value) || 1;
+//   const smaValues = calculateSMA(data, periods);
+//   data.forEach((row, index) => {
+//     const tr = document.createElement("tr");
+//     tr.innerHTML = `
+//             <td>${index + 1}</td>
+//             <td>${formatJstDate(row[0])}</td>
+//             <td>${formatPrice(row[4])}</td>
+//             <td>${formatPrice(smaValues[index])}</td>
+//             <td class="extra">${row[0]}</td>
+//             <td class="extra">${formatPrice(row[1])}</td>
+//             <td class="extra">${formatPrice(row[2])}</td>
+//             <td class="extra">${formatPrice(row[3])}</td>
+//             <td class="extra">${formatPrice(row[4])}</td>
+//             <td class="extra">${row[5] ?? "null"}</td>
+//             <td class="extra">${row[6] ?? "null"}</td>
+//             <td class="extra">${row[7] ?? "null"}</td>
+//             <td class="extra">${row[8] ?? "null"}</td>
+//             <td class="extra">${row[9] ?? "null"}</td>
+//         `;
+//     tbody.appendChild(tr);
+//   });
+//   toggleColumns();
+// }
+
 function updateTable(data) {
   if (!data) return;
   const tbody = document.querySelector("#jsonTable tbody");
@@ -100,22 +129,47 @@ function updateTable(data) {
   const smaValues = calculateSMA(data, periods);
   data.forEach((row, index) => {
     const tr = document.createElement("tr");
+    let closeBgColor = "";
+    let smaBgColor = "";
+    if (index < data.length - 1) {
+      // Compare with next row (earlier in time, index + 1)
+      const nextClose = data[index + 1][4];
+      const currentClose = row[4];
+      const nextSMA = smaValues[index + 1];
+      const currentSMA = smaValues[index];
+      if (currentClose !== null && nextClose !== null) {
+        closeBgColor =
+          currentClose > nextClose
+            ? "background-color: #90EE90;"
+            : currentClose < nextClose
+            ? "background-color: #FFB6C1;"
+            : "";
+      }
+      if (currentSMA !== null && nextSMA !== null) {
+        smaBgColor =
+          currentSMA > nextSMA
+            ? "background-color: #90EE90;"
+            : currentSMA < nextSMA
+            ? "background-color: #FFB6C1;"
+            : "";
+      }
+    }
     tr.innerHTML = `
-            <td>${index + 1}</td>
-            <td>${formatJstDate(row[0])}</td>
-            <td>${formatPrice(row[4])}</td>
-            <td>${formatPrice(smaValues[index])}</td>
-            <td class="extra">${row[0]}</td>
-            <td class="extra">${formatPrice(row[1])}</td>
-            <td class="extra">${formatPrice(row[2])}</td>
-            <td class="extra">${formatPrice(row[3])}</td>
-            <td class="extra">${formatPrice(row[4])}</td>
-            <td class="extra">${row[5] ?? "null"}</td>
-            <td class="extra">${row[6] ?? "null"}</td>
-            <td class="extra">${row[7] ?? "null"}</td>
-            <td class="extra">${row[8] ?? "null"}</td>
-            <td class="extra">${row[9] ?? "null"}</td>
-        `;
+      <td>${index + 1}</td>
+      <td>${formatJstDate(row[0])}</td>
+      <td style="${closeBgColor}">${formatPrice(row[4])}</td>
+      <td style="${smaBgColor}">${formatPrice(smaValues[index])}</td>
+      <td class="extra">${row[0]}</td>
+      <td class="extra">${formatPrice(row[1])}</td>
+      <td class="extra">${formatPrice(row[2])}</td>
+      <td class="extra">${formatPrice(row[3])}</td>
+      <td class="extra">${formatPrice(row[4])}</td>
+      <td class="extra">${row[5] ?? "null"}</td>
+      <td class="extra">${row[6] ?? "null"}</td>
+      <td class="extra">${row[7] ?? "null"}</td>
+      <td class="extra">${row[8] ?? "null"}</td>
+      <td class="extra">${row[9] ?? "null"}</td>
+    `;
     tbody.appendChild(tr);
   });
   toggleColumns();
