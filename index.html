@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0" /> -->
+    <title>Update OHLC JSON</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <h1>Update OHLC JSON</h1>
+    <button onclick="loadSavedData()">Load Saved Data</button>
+    <input
+      type="file"
+      id="jsonFileInput"
+      accept=".json"
+      onchange="uploadJson()"
+    />
+    <button onclick="getNewData()" id="getDataBtn" disabled>
+      Start New Data
+    </button>
+    <button onclick="saveNewJson()" id="saveJsonBtn" disabled>
+      Save New JSON
+    </button>
+    <div id="output"></div>
+    <div class="controls">
+      <label for="smaPeriods">SMA Periods: </label>
+      <input
+        type="number"
+        id="smaPeriods"
+        value="1"
+        onchange="updateTable(existingData || updatedJson)"
+      />
+      <label
+        ><input
+          type="checkbox"
+          id="toggleColumns"
+          checked
+          onchange="toggleColumns()"
+        />
+        Show Extra Columns</label
+      >
+    </div>
+    <div class="table-container">
+      <table id="jsonTable">
+        <thead>
+          <tr>
+            <th>Row</th>
+            <th>CLOSE Date Time</th>
+            <th>CLOSE</th>
+            <th>SMA</th>
+            <th class="extra">Timestamp</th>
+            <th class="extra">OPEN</th>
+            <th class="extra">HIGH</th>
+            <th class="extra">LOW</th>
+            <th class="extra">CLOSE</th>
+            <th class="extra">VOL</th>
+            <th class="extra">IND1</th>
+            <th class="extra">IND2</th>
+            <th class="extra">VOL1</th>
+            <th class="extra">VOL2</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <script src="script.js"></script>
+  </body>
+</html>
