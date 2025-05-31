@@ -92,6 +92,35 @@ function calculateSMA(data, periods) {
   return sma;
 }
 
+// // function updateTable(data) {
+// //   if (!data) return;
+// //   const tbody = document.querySelector("#jsonTable tbody");
+// //   tbody.innerHTML = "";
+// //   const periods = parseFloat(document.getElementById("smaPeriods").value) || 1;
+// //   const smaValues = calculateSMA(data, periods);
+// //   data.forEach((row, index) => {
+// //     const tr = document.createElement("tr");
+// //     tr.innerHTML = `
+// //             <td>${index + 1}</td>
+// //             <td>${formatJstDate(row[0])}</td>
+// //             <td>${formatPrice(row[4])}</td>
+// //             <td>${formatPrice(smaValues[index])}</td>
+// //             <td class="extra">${row[0]}</td>
+// //             <td class="extra">${formatPrice(row[1])}</td>
+// //             <td class="extra">${formatPrice(row[2])}</td>
+// //             <td class="extra">${formatPrice(row[3])}</td>
+// //             <td class="extra">${formatPrice(row[4])}</td>
+// //             <td class="extra">${row[5] ?? "null"}</td>
+// //             <td class="extra">${row[6] ?? "null"}</td>
+// //             <td class="extra">${row[7] ?? "null"}</td>
+// //             <td class="extra">${row[8] ?? "null"}</td>
+// //             <td class="extra">${row[9] ?? "null"}</td>
+// //         `;
+// //     tbody.appendChild(tr);
+// //   });
+// //   toggleColumns();
+// // }
+
 // function updateTable(data) {
 //   if (!data) return;
 //   const tbody = document.querySelector("#jsonTable tbody");
@@ -100,39 +129,121 @@ function calculateSMA(data, periods) {
 //   const smaValues = calculateSMA(data, periods);
 //   data.forEach((row, index) => {
 //     const tr = document.createElement("tr");
+//     let closeBgColor = "";
+//     let smaBgColor = "";
+//     if (index < data.length - 1) {
+//       // Compare with next row (earlier in time, index + 1)
+//       const nextClose = data[index + 1][4];
+//       const currentClose = row[4];
+//       const nextSMA = smaValues[index + 1];
+//       const currentSMA = smaValues[index];
+//       if (currentClose !== null && nextClose !== null) {
+//         closeBgColor =
+//           currentClose > nextClose
+//             ? "background-color: #90EE90;"
+//             : currentClose < nextClose
+//             ? "background-color: #FFB6C1;"
+//             : "";
+//       }
+//       if (currentSMA !== null && nextSMA !== null) {
+//         smaBgColor =
+//           currentSMA > nextSMA
+//             ? "background-color: #90EE90;"
+//             : currentSMA < nextSMA
+//             ? "background-color: #FFB6C1;"
+//             : "";
+//       }
+//     }
 //     tr.innerHTML = `
-//             <td>${index + 1}</td>
-//             <td>${formatJstDate(row[0])}</td>
-//             <td>${formatPrice(row[4])}</td>
-//             <td>${formatPrice(smaValues[index])}</td>
-//             <td class="extra">${row[0]}</td>
-//             <td class="extra">${formatPrice(row[1])}</td>
-//             <td class="extra">${formatPrice(row[2])}</td>
-//             <td class="extra">${formatPrice(row[3])}</td>
-//             <td class="extra">${formatPrice(row[4])}</td>
-//             <td class="extra">${row[5] ?? "null"}</td>
-//             <td class="extra">${row[6] ?? "null"}</td>
-//             <td class="extra">${row[7] ?? "null"}</td>
-//             <td class="extra">${row[8] ?? "null"}</td>
-//             <td class="extra">${row[9] ?? "null"}</td>
-//         `;
+//       <td>${index + 1}</td>
+//       <td>${formatJstDate(row[0])}</td>
+//       <td style="${closeBgColor}">${formatPrice(row[4])}</td>
+//       <td style="${smaBgColor}">${formatPrice(smaValues[index])}</td>
+//       <td class="extra">${row[0]}</td>
+//       <td class="extra">${formatPrice(row[1])}</td>
+//       <td class="extra">${formatPrice(row[2])}</td>
+//       <td class="extra">${formatPrice(row[3])}</td>
+//       <td class="extra">${formatPrice(row[4])}</td>
+//       <td class="extra">${row[5] ?? "null"}</td>
+//       <td class="extra">${row[6] ?? "null"}</td>
+//       <td class="extra">${row[7] ?? "null"}</td>
+//       <td class="extra">${row[8] ?? "null"}</td>
+//       <td class="extra">${row[9] ?? "null"}</td>
+//     `;
 //     tbody.appendChild(tr);
 //   });
 //   toggleColumns();
 // }
-
 function updateTable(data) {
   if (!data) return;
   const tbody = document.querySelector("#jsonTable tbody");
   tbody.innerHTML = "";
   const periods = parseFloat(document.getElementById("smaPeriods").value) || 1;
   const smaValues = calculateSMA(data, periods);
+  const positions = new Array(data.length).fill(null);
+  const plValues = new Array(data.length).fill(null);
+  const totalValues = new Array(data.length).fill(null);
+  let lastPosition = null;
+  let runningTotal = 0;
+
+  // Calculate positions, P/L, and total from oldest to newest
+  for (let i = data.length - 1; i >= 0; i--) {
+    const row = data[i];
+    let prevSmaColor =
+      i < data.length - 1
+        ? smaValues[i + 1] > (i + 2 < data.length ? smaValues[i + 2] : null)
+          ? "#90EE90"
+          : smaValues[i + 1] < (i + 2 < data.length ? smaValues[i + 2] : null)
+          ? "#FFB6C1"
+          : ""
+        : "";
+    let currentSmaColor =
+      i < data.length - 1
+        ? smaValues[i] > smaValues[i + 1]
+          ? "#90EE90"
+          : smaValues[i] < smaValues[i + 1]
+          ? "#FFB6C1"
+          : ""
+        : "";
+
+    // Calculate Position
+    if (
+      i === data.length - 1 ||
+      (currentSmaColor !== prevSmaColor && currentSmaColor !== "")
+    ) {
+      positions[i] = row[4] !== null ? row[4] : lastPosition;
+    } else {
+      positions[i] = lastPosition;
+    }
+    if (positions[i] !== null) lastPosition = positions[i];
+
+    // Calculate P/L and Total
+    if (i < data.length - 1 && row[4] !== null && positions[i + 1] !== null) {
+      if (prevSmaColor === "#90EE90") {
+        // Previous was long
+        plValues[i] = row[4] - positions[i + 1]; // Long: current CLOSE - previous Position
+      } else if (prevSmaColor === "#FFB6C1") {
+        // Previous was short
+        plValues[i] = positions[i + 1] - row[4]; // Short: previous Position - current CLOSE
+      }
+      // Add P/L to running total on position change
+      if (
+        i < data.length - 1 &&
+        currentSmaColor !== prevSmaColor &&
+        currentSmaColor !== ""
+      ) {
+        runningTotal += plValues[i] || 0;
+      }
+    }
+    totalValues[i] = runningTotal;
+  }
+
+  // Render table rows
   data.forEach((row, index) => {
     const tr = document.createElement("tr");
     let closeBgColor = "";
     let smaBgColor = "";
     if (index < data.length - 1) {
-      // Compare with next row (earlier in time, index + 1)
       const nextClose = data[index + 1][4];
       const currentClose = row[4];
       const nextSMA = smaValues[index + 1];
@@ -159,6 +270,9 @@ function updateTable(data) {
       <td>${formatJstDate(row[0])}</td>
       <td style="${closeBgColor}">${formatPrice(row[4])}</td>
       <td style="${smaBgColor}">${formatPrice(smaValues[index])}</td>
+      <td>${formatPrice(positions[index])}</td>
+      <td>${formatPrice(plValues[index])}</td>
+      <td>${formatPrice(totalValues[index])}</td>
       <td class="extra">${row[0]}</td>
       <td class="extra">${formatPrice(row[1])}</td>
       <td class="extra">${formatPrice(row[2])}</td>
