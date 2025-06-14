@@ -715,7 +715,7 @@ async function getNewData() {
       log("No Existing Data: Using most recent 9:00 AM JST");
     }
 
-    const recent9amMs = getMostRecent9amJst();
+    const recent9amMs = getMostRecent9amJst() - 86400000; // "- 86400000" sets the most recent timestamp to yesterday's 09:00
     const beforeMs =
       latestTimestamp && latestTimestamp > recent9amMs
         ? latestTimestamp
