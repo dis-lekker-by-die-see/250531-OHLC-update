@@ -485,7 +485,7 @@ function getTimestampedFilename() {
   const hours = jstTime.getHours().toString().padStart(2, "0"); // HH (24-hour)
   const minutes = jstTime.getMinutes().toString().padStart(2, "0"); // MM
   const seconds = jstTime.getSeconds().toString().padStart(2, "0"); // SS
-  return `OHLC-86400_${year}${month}${day}-${hours}${minutes}${seconds}`;
+  return `FXBTC-OHLC-d-all_${year}${month}${day}-${hours}${minutes}${seconds}`;
 }
 
 function formatJstDate(timestampMs) {
@@ -654,9 +654,9 @@ function toggleColumns() {
 }
 
 async function loadSavedData() {
-  log("Load Saved Data: Loading OHLC-86400.json");
+  log("Load Saved Data: Loading FXBTC-OHLC-d-all.json");
   try {
-    const response = await fetch("OHLC-86400.json");
+    const response = await fetch("FXBTC-OHLC-d-all.json");
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
