@@ -468,8 +468,10 @@ function getMostRecent9amJst() {
   recent9am.setUTCHours(0, 0, 0, 0); // Midnight UTC
   if (jstHour < 9) {
     recent9am.setUTCDate(recent9am.getUTCDate() - 1); // Previous day
+    //log(`Most Recent 09:00: ${recent9am.getTime()}`);
   }
   recent9am.setUTCHours(0, 0, 0, 0); // 00:00 UTC = 09:00 JST
+  log(`Most Recent 09:00: ${recent9am.getTime()}`);
   return recent9am.getTime();
 }
 
@@ -485,7 +487,8 @@ function getTimestampedFilename() {
   const hours = jstTime.getHours().toString().padStart(2, "0"); // HH (24-hour)
   const minutes = jstTime.getMinutes().toString().padStart(2, "0"); // MM
   const seconds = jstTime.getSeconds().toString().padStart(2, "0"); // SS
-  return `FXBTC-OHLC-d-all_${year}${month}${day}-${hours}${minutes}${seconds}`;
+  //return `FX_BTC_JPY-OHLC-d-all_${year}${month}${day}-${hours}${minutes}${seconds}`;
+  return `BTC_JPY-OHLC-d-all_${year}${month}${day}-${hours}${minutes}${seconds}`;
 }
 
 function formatJstDate(timestampMs) {
@@ -501,7 +504,8 @@ function formatJstDate(timestampMs) {
   const minutes = jstTime.getMinutes().toString().padStart(2, "0");
   const seconds = jstTime.getSeconds().toString().padStart(2, "0");
   const milliseconds = jstTime.getMilliseconds().toString().padStart(3, "0");
-  return `${year}-${month}-${day}_${hours}:${minutes} (${seconds}.${milliseconds})`;
+  //return `${year}-${month}-${day}_${hours}:${minutes} (${seconds}.${milliseconds})`;
+  return `${year}-${month}-${day}_${hours}:${minutes}`;
 }
 
 function formatPrice(value) {
@@ -509,21 +513,46 @@ function formatPrice(value) {
   return Math.round(value).toLocaleString("en-US", { useGrouping: true });
 }
 
+// function calculateSMA(data, periods) {
+//   if (!data || data.length === 0) return [];
+//   const sma = new Array(data.length).fill(null);
+//   if (data.length > 0) {
+//     sma[data.length - 1] =
+//       data[data.length - 1][4] !== null
+//         ? Math.round(data[data.length - 1][4])
+//         : null; // Initialize with oldest closing price
+//     for (let i = data.length - 2; i >= 0; i--) {
+//       const currentClose = data[i][4];
+//       const prevSMA = sma[i + 1];
+//       if (currentClose !== null && prevSMA !== null) {
+//         sma[i] = Math.round((prevSMA * (periods - 1) + currentClose) / periods);
+//       } else {
+//         sma[i] = prevSMA; // Use previous SMA if current close is null
+//       }
+//     }
+//   }
+//   return sma;
+// }
 function calculateSMA(data, periods) {
   if (!data || data.length === 0) return [];
   const sma = new Array(data.length).fill(null);
   if (data.length > 0) {
-    sma[data.length - 1] =
-      data[data.length - 1][4] !== null
-        ? Math.round(data[data.length - 1][4])
-        : null; // Initialize with oldest closing price
-    for (let i = data.length - 2; i >= 0; i--) {
-      const currentClose = data[i][4];
-      const prevSMA = sma[i + 1];
-      if (currentClose !== null && prevSMA !== null) {
-        sma[i] = Math.round((prevSMA * (periods - 1) + currentClose) / periods);
-      } else {
-        sma[i] = prevSMA; // Use previous SMA if current close is null
+    for (let i = data.length - 1; i >= 0; i--) {
+      let sum = 0;
+      let count = 0;
+      // Average from current row to 'periods' newer rows
+      for (let j = i; j < Math.min(data.length, i + Math.floor(periods)); j++) {
+        const close = data[j][4];
+        if (close !== null) {
+          sum += close;
+          count++;
+        }
+      }
+      // Calculate SMA if enough non-null values
+      if (count > 0) {
+        sma[i] = Math.round(sum / count);
+      } else if (i < data.length - 1) {
+        sma[i] = sma[i + 1]; // Use previous SMA if no valid closes
       }
     }
   }
@@ -654,9 +683,13 @@ function toggleColumns() {
 }
 
 async function loadSavedData() {
-  log("Load Saved Data: Loading FXBTC-OHLC-d-all.json");
+  //log("Load Saved Data: Loading FX_BTC_JPY-OHLC-d-all.json");
+  log("Load Saved Data: Loading BTC_JPY-OHLC-d-all.json");
+  existingData = null; // Clear existing data before fetch
   try {
-    const response = await fetch("FXBTC-OHLC-d-all.json");
+    //const response = await fetch("FX_BTC_JPY-OHLC-d-all.json");
+    const cacheBuster = `?_=${new Date().getTime()}`; // Prevent caching and reusing old json data
+    const response = await fetch(`BTC_JPY-OHLC-d-all.json${cacheBuster}`);
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
@@ -715,7 +748,7 @@ async function getNewData() {
       log("No Existing Data: Using most recent 9:00 AM JST");
     }
 
-    const recent9amMs = getMostRecent9amJst() - 86400000; // "- 86400000" sets the most recent timestamp to yesterday's 09:00
+    const recent9amMs = getMostRecent9amJst(); // - 86400000; // "- 86400000" sets the most recent timestamp to yesterday's 09:00
     const beforeMs =
       latestTimestamp && latestTimestamp > recent9amMs
         ? latestTimestamp
@@ -723,7 +756,8 @@ async function getNewData() {
     log(`API Query Before: ${beforeMs} (${new Date(beforeMs).toISOString()})`);
 
     const params = new URLSearchParams({
-      symbol: "FX_BTC_JPY",
+      //symbol: "FX_BTC_JPY",
+      symbol: "BTC_JPY",
       period: "d",
       before: beforeMs.toString(),
     });

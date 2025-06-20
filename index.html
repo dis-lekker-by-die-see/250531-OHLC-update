@@ -26,7 +26,7 @@
       <input
         type="number"
         id="smaPeriods"
-        value="1"
+        value="120"
         onchange="updateTable(existingData || updatedJson)"
       />
       <label
@@ -44,7 +44,7 @@
         <thead>
           <tr>
             <th>Row</th>
-            <th>CLOSE Date Time</th>
+            <th>OPEN Date Time</th>
             <th>CLOSE</th>
             <th>SMA</th>
             <th>Position</th>
@@ -56,10 +56,10 @@
             <th class="extra">LOW</th>
             <th class="extra">CLOSE</th>
             <th class="extra">VOL</th>
-            <th class="extra">IND1</th>
-            <th class="extra">IND2</th>
-            <th class="extra">VOL1</th>
-            <th class="extra">VOL2</th>
+            <th class="extra">ASK</th>
+            <th class="extra">BID</th>
+            <th class="extra">SELL VOL</th>
+            <th class="extra">BUY VOL</th>
           </tr>
         </thead>
         <tbody></tbody>
