@@ -3,11 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Update OHLC JSON</title>
+    <title>Spot 1 Day</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <h1>Update OHLC JSON</h1>
+    <h1></h1>
     <button onclick="loadSavedData()">Load Saved Data</button>
     <input
       type="file"
@@ -17,15 +17,22 @@
     />
     <button onclick="getNewData()" id="getDataBtn" disabled>Update Data</button>
     <button onclick="saveNewJson()" id="saveJsonBtn" disabled>
-      Download JSON
+      Download Data
     </button>
-    <button onclick="downloadCsv()">Download CSV</button>
+    <button onclick="downloadCsv()">Download Table CSV</button>
     <div id="output"></div>
     <div class="controls">
-      <label for="smaPeriods">SMA Periods: </label>
+      <label for="sma1Periods">SMA1: </label>
       <input
         type="number"
-        id="smaPeriods"
+        id="sma1Periods"
+        value="4"
+        onchange="updateTable(existingData || updatedJson)"
+      />
+      <label for="sma2Periods">SMA2: </label>
+      <input
+        type="number"
+        id="sma2Periods"
         value="120"
         onchange="updateTable(existingData || updatedJson)"
       />
@@ -46,7 +53,8 @@
             <th>Row</th>
             <th>OPEN Date Time</th>
             <th>CLOSE</th>
-            <th>SMA</th>
+            <th>SMA1</th>
+            <th>SMA2</th>
             <th>Position</th>
             <th>P/L</th>
             <th>Total</th>
