@@ -13,14 +13,18 @@ function getMostRecent9amJst() {
   const utcMinutes = now.getUTCHours() * 60 + now.getUTCMinutes();
   const jstMinutes = (utcMinutes + jstOffset) % (24 * 60);
   const jstHour = Math.floor(jstMinutes / 60);
+  //log(`Math.floor(jstMinutes / 60): ${Math.floor(jstMinutes / 60)}`);
   let recent9am = new Date(now);
   recent9am.setUTCHours(0, 0, 0, 0); // Midnight UTC
-  if (jstHour < 9) {
-    recent9am.setUTCDate(recent9am.getUTCDate() - 1); // Previous day
-    //log(`Most Recent 09:00: ${recent9am.getTime()}`);
-  }
-  recent9am.setUTCHours(0, 0, 0, 0); // 00:00 UTC = 09:00 JST
-  log(`Most Recent 09:00: ${recent9am.getTime()}`);
+  // if (jstHour < 9) {
+  //   recent9am.setUTCDate(recent9am.getUTCDate() - 1); // Previous day
+  //   log(`1 Most Recent 09:00: ${recent9am.getTime()}`);
+  // }
+  // recent9am.setUTCHours(0, 0, 0, 0); // 00:00 UTC = 09:00 JST
+  // log(`2 Most Recent 09:00: ${recent9am.getTime()}`);
+
+  recent9am.setUTCDate(recent9am.getUTCDate() - 1); // Previous day
+  log(`Most Recently Completed 1 Day: ${recent9am.getTime()}`);
   return recent9am.getTime();
 }
 
@@ -343,7 +347,7 @@ async function getNewData() {
       period: "d",
       before: beforeMs.toString(),
     });
-    log(`Fetch Request Sent: GET ${apiUrl} with params ${params.toString()}`);
+    log(`GET    ${apiUrl}?${params.toString()}`);
 
     const response = await fetch(`${apiUrl}?${params}`, {
       headers: {
